@@ -194,7 +194,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 **Faisal Arafah**
 - GitHub: [@faisalarafeh](https://github.com/faisalarafeh)
-- Email: 3faisalarafeh@gmail.com
 
 ---
 
