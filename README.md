@@ -4,8 +4,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-![Password Intelligence Screenshot](https://via.placeholder.com/800x400/0a0a0f/00d4ff?text=Password+Intelligence+Screenshot)
-
 ## ✨ Features
 
 ### 🔍 Real-time Analysis
