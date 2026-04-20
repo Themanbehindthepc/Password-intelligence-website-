@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faisal Vault — Password Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --deep-teal: #0d3b3b;
+            --deep-teal-light: #1a4a4a;
+            --warm-cream: #faf8f5;
+            --soft-taupe: #f0ede8;
+            --terracotta: #c4705a;
+            --terracotta-soft: #d48570;
+            --gold: #d4a574;
+            --text-primary: #1a1a1a;
+            --text-secondary: #5a5a5a;
+            --text-muted: #8a8a8a;
+            --border: rgba(0, 0, 0, 0.06);
+            --status-strong: #2d5a3d;
+            --status-weak: #9b4444;
+            --status-fair: #8b6f47;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.05); opacity: 0.5; }
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, var(--warm-cream) 0%, var(--soft-taupe) 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .bg-mesh {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.3;
+        }
+
+        .bg-mesh::before {
+            content: '';
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(196, 112, 90, 0.1) 0%, transparent 40%),
+                        radial-gradient(circle at 70% 80%, rgba(13, 59, 59, 0.08) 0%, transparent 40%);
+            animation: gradientShift 15s ease infinite;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Compact Header */
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .logo-icon {
+            width: 48px; height: 48px;
+            background: var(--deep-teal);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 2px solid var(--terracotta);
+            border-radius: 16px;
+            opacity: 0.3;
+            animation: pulse 3s ease infinite;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--deep-teal);
+            letter-spacing: -0.02em;
+        }
+
+        h1 span {
+            color: var(--terracotta);
+            font-weight: 400;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* Compact Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Compact Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 32px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Input Section */
+        .input-section { margin-bottom: 20px; }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .input-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 4px;
+            background: var(--soft-taupe);
+            padding: 4px;
+            border-radius: 100px;
+        }
+
+        .mode-btn {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-body);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .mode-btn.active {
+            background: white;
+            color: var(--deep-teal);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .password-container { position: relative; }
+
+        #passwordInput {
+            width: 100%;
+            padding: 18px 60px 18px 20px;
+            font-size: 1rem;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: var(--soft-taupe);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+
+        #passwordInput:focus {
+            outline: none;
+            background: white;
+            border-color: var(--terracotta);
+        }
+
+        .input-actions {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            width: 36px; height: 36px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--terracotta);
+            color: white;
+        }
+
+        /* Compact Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Score Card */
+        .score-card {
+            background: linear-gradient(135deg, var(--deep-teal) 0%, var(--deep-teal-light) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .score-value {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .score-value.weak { color: #ffb3b3; }
+        .score-value.fair { color: #ffe4b3; }
+        .score-value.good { color: #b3d9ff; }
+        .score-value.strong { color: #b3ffc9; }
+
+        .score-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.8;
+        }
+
+        /* Details Card */
+        .details-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .crack-info {
+            background: var(--soft-taupe);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        .crack-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .crack-time {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--deep-teal);
+            margin-bottom: 4px;
+        }
+
+        .crack-method {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            margin-top: auto;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: all 0.4s ease;
+        }
+
+        .progress-fill.weak { background: linear-gradient(90deg, var(--status-weak), #d48570); width: 25%; }
+        .progress-fill.fair { background: linear-gradient(90deg, var(--status-fair), var(--gold)); width: 50%; }
+        .progress-fill.good { background: linear-gradient(90deg, var(--deep-teal-light), var(--status-strong)); width: 75%; }
+        .progress-fill.strong { background: linear-gradient(90deg, var(--status-strong), #3a7a4d); width: 100%; }
+
+        /* Analysis Grid - Compact */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 700px) {
+            .analysis-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .analysis-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 6px;
+            padding: 12px 8px;
+            background: var(--soft-taupe);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .analysis-item.pass {
+            background: rgba(45, 90, 61, 0.08);
+            border-color: var(--status-strong);
+        }
+
+        .analysis-icon {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .analysis-item.pass .analysis-icon {
+            background: var(--status-strong);
+            color: white;
+        }
+
+        .analysis-item.fail .analysis-icon {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--text-muted);
+        }
+
+        .analysis-text {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Pattern Alerts - Compact */
+        .pattern-alert {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(155, 68, 68, 0.06);
+            border: 1px solid rgba(155, 68, 68, 0.15);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .pattern-icon {
+            width: 32px; height: 32px;
+            background: var(--status-weak);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .pattern-content { flex: 1; min-width: 0; }
+
+        .pattern-content h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--status-weak);
+            margin-bottom: 2px;
+        }
+
+        .pattern-content p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Sidebar Cards - Compact */
+        .sidebar > * { margin-bottom: 16px; }
+
+        .sidebar-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-title::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: var(--terracotta);
+            border-radius: 50%;
+        }
+
+        /* Passphrase Generator */
+        .passphrase-box {
+            background: var(--soft-taupe);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .passphrase-box.visible { display: block; }
+
+        .passphrase-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .word-chip {
+            padding: 6px 12px;
+            background: white;
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .memorable-story {
+            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            border-left: 3px solid var(--terracotta);
+            font-family: var(--font-display);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--terracotta);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: all 0.2s;
+        }
+
+        .generate-btn:hover {
+            background: var(--deep-teal);
+        }
+
+        /* Breach Status */
+        .breach-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .breach-box.checking {
+            background: var(--soft-taupe);
+        }
+
+        .breach-box.safe {
+            background: rgba(45, 90, 61, 0.08);
+            border: 1px solid rgba(45, 90, 61, 0.15);
+        }
+
+        .breach-box.compromised {
+            background: rgba(155, 68, 68, 0.06);
+            border: 1px solid rgba(155, 68, 68, 0.15);
+        }
+
+        .breach-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .breach-box.safe .breach-icon {
+            background: var(--status-strong);
+            color: white;
+        }
+
+        .breach-box.compromised .breach-icon {
+            background: var(--status-weak);
+            color: white;
+        }
+
+        .breach-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .breach-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* NIST Badge */
+        .nist-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: var(--soft-taupe);
+            border-radius: 10px;
+        }
+
+        .nist-icon {
+            width: 40px; height: 40px;
+            background: var(--deep-teal);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: white;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .nist-text h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .nist-text p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Comparison - Compact Toggle */
+        .comparison-toggle {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .comparison-header h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+        }
+
+        .comparison-header span {
+            font-size: 0.8rem;
+            color: var(--terracotta);
+        }
+
+        .comparison-content {
+            display: none;
+            padding-top: 16px;
+        }
+
+        .comparison-content.visible { display: block; }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .comparison-card {
+            padding: 16px;
+            border-radius: 10px;
+        }
+
+        .comparison-card.weak {
+            background: rgba(155, 68, 68, 0.06);
+            border: 1px solid rgba(155, 68, 68, 0.12);
+        }
+
+        .comparison-card.strong {
+            background: rgba(45, 90, 61, 0.06);
+            border: 1px solid rgba(45, 90, 61, 0.12);
+        }
+
+        .comparison-card h4 {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .comparison-card.weak h4 { color: var(--status-weak); }
+        .comparison-card.strong h4 { color: var(--status-strong); }
+
+        .comparison-password {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .comparison-metric {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+        }
+
+        .comparison-metric:last-child { margin-bottom: 0; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 48px; height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--deep-teal);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 1000;
+            font-size: 0.9rem;
+        }
+
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(13, 59, 59, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+
+        .modal-content {
+            background: var(--warm-cream);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 420px;
+            text-align: center;
+            transform: scale(0.95);
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.show .modal-content { transform: scale(1); }
+
+        .modal-icon {
+            width: 64px; height: 64px;
+            background: var(--status-weak);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--status-weak);
+            margin-bottom: 8px;
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .modal-stats {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .modal-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .modal-stat:last-child { margin-bottom: 0; }
+
+        .modal-stat-label { color: var(--text-muted); }
+        .modal-stat-value { color: var(--status-weak); font-weight: 600; }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: all 0.2s;
+        }
+
+        .modal-btn.primary {
+            background: var(--terracotta);
+            color: white;
+        }
+
+        .modal-btn.primary:hover { background: var(--deep-teal); }
+
+        .modal-btn.secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        footer a {
+            color: var(--terracotta);
+            text-decoration: none;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <h1>Faisal <span>Vault</span></h1>
+            </div>
+            <p class="subtitle">Intelligent password security — analyze, generate, and protect</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Main Analysis -->
+            <div class="main-column">
+                <div class="card">
+                    <!-- Input -->
+                    <div class="input-section">
+                        <div class="input-header">
+                            <span class="input-label">Analyze Password</span>
+                            <div class="mode-toggle">
+                                <button class="mode-btn active" data-mode="analyze">Analyze</button>
+                                <button class="mode-btn" data-mode="generate">Generate</button>
+                            </div>
+                        </div>
+                        <div class="password-container">
+                            <input type="password" id="passwordInput" placeholder="Type or paste a password..." autocomplete="off">
+                            <div class="input-actions">
+                                <button class="icon-btn" id="toggleBtn" title="Show/Hide">👁</button>
+                                <button class="icon-btn" id="copyBtn" title="Copy">📋</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-state" id="emptyState">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <p>Enter a password to analyze</p>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="resultsSection" class="hidden">
+                        <div class="results-grid">
+                            <div class="score-card">
+                                <div class="score-value" id="scoreValue">0</div>
+                                <div class="score-label">Entropy Bits</div>
+                            </div>
+                            <div class="details-card">
+                                <div class="crack-info">
+                                    <div class="crack-label">Estimated Crack Time</div>
+                                    <div class="crack-time" id="crackTime">Instantly</div>
+                                    <div class="crack-method" id="crackMethod">Dictionary attack</div>
+                                </div>
+                                <div class="progress-section">
+                                    <div class="progress-label">
+                                        <span>Strength</span>
+                                        <span id="strengthLabel">Weak</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="progressFill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analysis -->
+                        <div class="analysis-grid" id="analysisGrid">
+                            <div class="analysis-item" data-check="length">
+                                <div class="analysis-icon">○</div>
+                                <div class="analysis-text">12+ chars</div>
+                            </div>
+                            <div class="analysis-item" data-check="uppercase">
+                                <div class="analysis-icon">○</div>
+                                <div class="analysis-text">Uppercase</div>
+                            </div>
+                            <div class="analysis-item" data-check="lowercase">
+                                <div class="analysis-icon">○</div>
+                                <div class="analysis-text">Lowercase</div>
+                            </div>
+                            <div class="analysis-item" data-check="number">
+                                <div class="analysis-icon">○</div>
+                                <div class="analysis-text">Number</div>
+                            </div>
+                            <div class="analysis-item" data-check="special">
+                                <div class="analysis-icon">○</div>
+                                <div class="analysis-text">Special</div>
+                            </div>
+                            <div class="analysis-item" data-check="unique">
+                                <div class="analysis-icon">○</div>
+                                <div class="analysis-text">No patterns</div>
+                            </div>
+                        </div>
+
+                        <!-- Patterns -->
+                        <div id="patternsSection"></div>
+
+                        <!-- Comparison Toggle -->
+                        <div class="comparison-toggle" id="comparisonSection">
+                            <div class="comparison-header" onclick="toggleComparison()">
+                                <h3>Compare with Generated</h3>
+                                <span>▼ Show</span>
+                            </div>
+                            <div class="comparison-content" id="comparisonContent">
+                                <div class="comparison-grid">
+                                    <div class="comparison-card weak">
+                                        <h4>Yours</h4>
+                                        <div class="comparison-password" id="userPass">-</div>
+                                        <div class="comparison-metric">
+                                            <span>Entropy</span>
+                                            <strong id="userEntropy">0 bits</strong>
+                                        </div>
+                                        <div class="comparison-metric">
+                                            <span>Crack time</span>
+                                            <strong id="userCrack">Instant</strong>
+                                        </div>
+                                    </div>
+                                    <div class="comparison-card strong">
+                                        <h4>Generated</h4>
+                                        <div class="comparison-password" id="genPass">-</div>
+                                        <div class="comparison-metric">
+                                            <span>Entropy</span>
+                                            <strong id="genEntropy">0 bits</strong>
+                                        </div>
+                                        <div class="comparison-metric">
+                                            <span>Crack time</span>
+                                            <strong id="genCrack">Centuries</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Passphrase -->
+                <div class="card">
+                    <h3 class="sidebar-title">Passphrase</h3>
+                    <div class="passphrase-box" id="passphraseBox">
+                        <div class="passphrase-words" id="passphraseWords"></div>
+                        <div class="memorable-story" id="memorableStory"></div>
+                    </div>
+                    <button class="generate-btn" id="generateBtn">Generate Secure Passphrase</button>
+                </div>
+
+                <!-- Breach -->
+                <div class="card">
+                    <h3 class="sidebar-title">Breach Check</h3>
+                    <div class="breach-box checking" id="breachBox">
+                        <div class="breach-icon">⊘</div>
+                        <div class="breach-info">
+                            <h4>Waiting</h4>
+                            <p>Enter password to check</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NIST -->
+                <div class="card">
+                    <h3 class="sidebar-title">NIST</h3>
+                    <div class="nist-box" id="nistBox">
+                        <div class="nist-icon">800</div>
+                        <div class="nist-text">
+                            <h4>Checking...</h4>
+                            <p>SP 800-63B compliance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Faisal Vault — Powered by HaveIBeenPwned API</p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard</div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠</div>
+            <h2 class="modal-title">Weak Password Detected</h2>
+            <p class="modal-text">This password can be compromised quickly.</p>
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <span class="modal-stat-label">Entropy:</span>
+                    <span class="modal-stat-value" id="modalEntropy">12 bits</span>
+                </div>
+                <div class="modal-stat">
+                    <span class="modal-stat-label">Crack time:</span>
+                    <span class="modal-stat-value" id="modalCrack">Instantly</span>
+                </div>
+                <div class="modal-stat">
+                    <span class="modal-stat-label">Issues:</span>
+                    <span class="modal-stat-value" id="modalIssues">3</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="generateSecure()">Generate Secure</button>
+                <button class="modal-btn secondary" onclick="closeModal()">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Word lists
+        const words = {
+            nouns: ['tiger', 'river', 'mountain', 'castle', 'thunder', 'ocean', 'forest', 'desert', 'galaxy', 'crystal',
+                    'dragon', 'phoenix', 'shadow', 'ancient', 'mystic', 'golden', 'silent', 'frozen', 'ember', 'obsidian'],
+            verbs: ['running', 'jumping', 'flying', 'dreaming', 'singing', 'dancing', 'roaring', 'racing', 'soaring', 'diving'],
+            adjectives: ['swift', 'brave', 'mighty', 'clever', 'fierce', 'noble', 'cosmic', 'frozen', 'burning', 'hidden'],
+            objects: ['sword', 'shield', 'crown', 'mirror', 'compass', 'lantern', 'feather', 'hammer', 'rocket', 'key']
+        };
+
+        const patterns = {
+            keyboard: ['qwerty', 'asdf', 'zxcv', 'qazwsx', '1q2w3e', 'wasd', 'qweasd'],
+            common: ['123456', 'password', 'qwerty', 'abc123', 'letmein', 'welcome', 'admin', 'login'],
+            dates: /\b(19|20)\d{2}\b/,
+            repeated: /(.)\1{2,}/,
+            sequences: /(abc|bcd|cde|def|123|234|345|456|567|678|789)/i
+        };
+
+        // Elements
+        const passwordInput = document.getElementById('passwordInput');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const toast = document.getElementById('toast');
+        const emptyState = document.getElementById('emptyState');
+        const resultsSection = document.getElementById('resultsSection');
+        const patternsSection = document.getElementById('patternsSection');
+        const comparisonSection = document.getElementById('comparisonSection');
+        let currentPassphrase = '';
+        let modalShown = false;
+
+        // Toggle password visibility
+        toggleBtn.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            toggleBtn.textContent = type === 'password' ? '👁' : '🙈';
+        });
+
+        // Copy
+        copyBtn.addEventListener('click', () => {
+            if (passwordInput.value) {
+                navigator.clipboard.writeText(passwordInput.value);
+                showToast();
+            }
+        });
+
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Calculate entropy
+        function calcEntropy(pwd) {
+            let pool = 0;
+            if (/[a-z]/.test(pwd)) pool += 26;
+            if (/[A-Z]/.test(pwd)) pool += 26;
+            if (/[0-9]/.test(pwd)) pool += 10;
+            if (/[^a-zA-Z0-9]/.test(pwd)) pool += 33;
+            return pool === 0 ? 0 : Math.round(pwd.length * Math.log2(pool));
+        }
+
+        // Detect patterns
+        function detectPatterns(pwd) {
+            const warnings = [];
+            const lower = pwd.toLowerCase();
+
+            for (const walk of patterns.keyboard) {
+                if (lower.includes(walk)) {
+                    warnings.push({ icon: '⌨️', title: 'Keyboard Pattern', msg: `Contains "${walk}"` });
+                    break;
+                }
+            }
+
+            for (const common of patterns.common) {
+                if (lower.includes(common)) {
+                    warnings.push({ icon: '⚠️', title: 'Common Password', msg: 'Found in breached passwords' });
+                    break;
+                }
+            }
+
+            if (patterns.dates.test(pwd)) warnings.push({ icon: '📅', title: 'Date Pattern', msg: 'Avoid years & dates' });
+            if (patterns.repeated.test(pwd)) warnings.push({ icon: '🔁', title: 'Repetition', msg: 'Repeated characters' });
+            if (patterns.sequences.test(lower)) warnings.push({ icon: '📊', title: 'Sequence', msg: 'Predictable sequence' });
+
+            return warnings;
+        }
+
+        // Estimate crack time
+        function estimateCrack(entropy) {
+            const combos = Math.pow(2, entropy);
+            const sec = combos / 1e12;
+
+            if (sec < 1) return { time: 'Instantly', method: 'Dictionary attack', safe: false };
+            if (sec < 60) return { time: 'Seconds', method: 'Brute force', safe: false };
+            if (sec < 3600) return { time: Math.round(sec/60) + ' min', method: 'GPU attack', safe: false };
+            if (sec < 86400) return { time: Math.round(sec/3600) + ' hrs', method: 'Hardware attack', safe: false };
+            if (sec < 31536000) return { time: Math.round(sec/86400) + ' days', method: 'Distributed attack', safe: false };
+            if (sec < 3153600000) return { time: Math.round(sec/31536000) + ' yrs', method: 'State-level', safe: true };
+            return { time: 'Centuries', method: 'Theoretically secure', safe: true };
+        }
+
+        function getStrength(entropy) {
+            if (entropy < 40) return { class: 'weak', label: 'Weak' };
+            if (entropy < 60) return { class: 'fair', label: 'Fair' };
+            if (entropy < 80) return { class: 'good', label: 'Good' };
+            return { class: 'strong', label: 'Strong' };
+        }
+
+        // SHA1 for breach check
+        async function sha1(msg) {
+            const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(msg));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        async function checkBreach(pwd) {
+            const box = document.getElementById('breachBox');
+            if (!pwd) {
+                box.className = 'breach-box checking';
+                box.innerHTML = '<div class="breach-icon">⊘</div><div class="breach-info"><h4>Waiting</h4><p>Enter password to check</p></div>';
+                return;
+            }
+
+            box.className = 'breach-box checking';
+            box.innerHTML = '<div class="breach-icon">◐</div><div class="breach-info"><h4>Checking...</h4><p>Querying database</p></div>';
+
+            try {
+                const hash = await sha1(pwd);
+                const res = await fetch(`https://api.pwnedpasswords.com/range/${hash.slice(0,5)}`);
+                const data = await res.text();
+                const found = data.split('\n').some(line => line.split(':')[0] === hash.slice(5));
+
+                if (found) {
+                    box.className = 'breach-box compromised';
+                    box.innerHTML = '<div class="breach-icon">✕</div><div class="breach-info"><h4 style="color:var(--status-weak)">Compromised</h4><p>Found in data breaches</p></div>';
+                } else {
+                    box.className = 'breach-box safe';
+                    box.innerHTML = '<div class="breach-icon">✓</div><div class="breach-info"><h4 style="color:var(--status-strong)">Not Found</h4><p>No breaches detected</p></div>';
+                }
+            } catch {
+                box.className = patterns.common.some(c => pwd.toLowerCase().includes(c)) ? 'breach-box compromised' : 'breach-box safe';
+                box.innerHTML = box.className.includes('compromised')
+                    ? '<div class="breach-icon">✕</div><div class="breach-info"><h4 style="color:var(--status-weak)">Compromised</h4><p>Matches known passwords</p></div>'
+                    : '<div class="breach-icon">✓</div><div class="breach-info"><h4 style="color:var(--status-strong)">Likely Safe</h4><p>Local check passed</p></div>';
+            }
+        }
+
+        function updateNIST(pwd, warnings) {
+            const box = document.getElementById('nistBox');
+            const compliant = pwd.length >= 8 && !patterns.common.some(c => pwd.toLowerCase().includes(c)) && warnings.length === 0;
+            box.innerHTML = compliant
+                ? '<div class="nist-icon" style="background:var(--status-strong)">✓</div><div class="nist-text"><h4>Compliant</h4><p>Meets NIST SP 800-63B</p></div>'
+                : '<div class="nist-icon" style="background:var(--gold);color:var(--text-primary)">!</div><div class="nist-text"><h4>Non-Compliant</h4><p>Review NIST guidelines</p></div>';
+        }
+
+        // Main analysis
+        function analyze() {
+            const pwd = passwordInput.value;
+
+            if (!pwd) {
+                emptyState.classList.remove('hidden');
+                resultsSection.classList.add('hidden');
+                patternsSection.innerHTML = '';
+                comparisonSection.classList.add('hidden');
+                modalShown = false;
+                checkBreach('');
+                updateNIST('', []);
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+
+            const entropy = calcEntropy(pwd);
+            const warnings = detectPatterns(pwd);
+            const crack = estimateCrack(entropy);
+            const strength = getStrength(entropy);
+
+            // Update score
+            const scoreEl = document.getElementById('scoreValue');
+            scoreEl.textContent = entropy;
+            scoreEl.className = 'score-value ' + strength.class;
+
+            document.getElementById('crackTime').textContent = crack.time;
+            document.getElementById('crackMethod').textContent = crack.method;
+            document.getElementById('strengthLabel').textContent = strength.label;
+
+            const fill = document.getElementById('progressFill');
+            fill.className = 'progress-fill ' + strength.class;
+
+            // Update checks
+            const checks = {
+                length: pwd.length >= 12,
+                uppercase: /[A-Z]/.test(pwd),
+                lowercase: /[a-z]/.test(pwd),
+                number: /[0-9]/.test(pwd),
+                special: /[^a-zA-Z0-9]/.test(pwd),
+                unique: warnings.length === 0
+            };
+
+            Object.keys(checks).forEach(key => {
+                const item = document.querySelector(`[data-check="${key}"]`);
+                const icon = item.querySelector('.analysis-icon');
+                item.classList.toggle('pass', checks[key]);
+                item.classList.toggle('fail', !checks[key]);
+                icon.textContent = checks[key] ? '✓' : '○';
+            });
+
+            // Update patterns
+            patternsSection.innerHTML = warnings.map(w => `
+                <div class="pattern-alert">
+                    <div class="pattern-icon">${w.icon}</div>
+                    <div class="pattern-content">
+                        <h4>${w.title}</h4>
+                        <p>${w.msg}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            checkBreach(pwd);
+            updateNIST(pwd, warnings);
+
+            // Update comparison
+            if (currentPassphrase) {
+                comparisonSection.classList.remove('hidden');
+                const genEntropy = calcEntropy(currentPassphrase);
+                const genCrack = estimateCrack(genEntropy);
+                document.getElementById('userPass').textContent = pwd.slice(0, 25) + (pwd.length > 25 ? '...' : '');
+                document.getElementById('userEntropy').textContent = entropy + ' bits';
+                document.getElementById('userCrack').textContent = crack.time;
+                document.getElementById('genPass').textContent = currentPassphrase;
+                document.getElementById('genEntropy').textContent = genEntropy + ' bits';
+                document.getElementById('genCrack').textContent = genCrack.time;
+            }
+
+            // Show modal for weak passwords
+            if (pwd.length >= 6 && (entropy < 35 || warnings.length >= 2)) {
+                showModal(entropy, warnings.length, crack.time);
+            }
+        }
+
+        function showModal(entropy, issues, crackTime) {
+            if (modalShown) return;
+            document.getElementById('modalEntropy').textContent = entropy + ' bits';
+            document.getElementById('modalCrack').textContent = crackTime;
+            document.getElementById('modalIssues').textContent = issues;
+            document.getElementById('modal').classList.add('show');
+            modalShown = true;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        function generateSecure() {
+            closeModal();
+            generatePassphrase();
+        }
+
+        function toggleComparison() {
+            const content = document.getElementById('comparisonContent');
+            const header = document.querySelector('.comparison-header span');
+            content.classList.toggle('visible');
+            header.textContent = content.classList.contains('visible') ? '▲ Hide' : '▼ Show';
+        }
+
+        // Generate passphrase
+        function generatePassphrase() {
+            const adj = getRandom(words.adjectives);
+            const noun1 = getRandom(words.nouns);
+            const verb = getRandom(words.verbs);
+            const noun2 = getRandom(words.objects);
+            const num = Math.floor(Math.random() * 90) + 10;
+            const special = ['!', '@', '#', '$'][Math.floor(Math.random() * 4)];
+
+            currentPassphrase = `${adj}-${noun1}-${verb}-${noun2}${num}${special}`;
+
+            document.getElementById('passphraseBox').classList.add('visible');
+            document.getElementById('passphraseWords').innerHTML = `
+                <span class="word-chip">${adj}</span>
+                <span class="word-chip">${noun1}</span>
+                <span class="word-chip">${verb}</span>
+                <span class="word-chip">${noun2}</span>
+                <span class="word-chip">${num}</span>
+                <span class="word-chip">${special}</span>
+            `;
+            document.getElementById('memorableStory').textContent = `A ${adj} ${noun1} ${verb} toward a ${noun2}`;
+
+            passwordInput.value = currentPassphrase;
+            analyze();
+        }
+
+        function getRandom(arr) {
+            const arr32 = new Uint32Array(1);
+            crypto.getRandomValues(arr32);
+            return arr[arr32[0] % arr.length];
+        }
+
+        // Event listeners
+        passwordInput.addEventListener('input', analyze);
+        document.getElementById('generateBtn').addEventListener('click', generatePassphrase);
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (btn.dataset.mode === 'generate') generatePassphrase();
+            });
+        });
+
+        document.getElementById('modal').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal')) closeModal();
+        });
+    </script>
+</body>
+</html>
