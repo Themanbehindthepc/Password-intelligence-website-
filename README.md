@@ -41,12 +41,6 @@
 - **Zero Data Collection**: No passwords are ever sent to any server
 - **Open Source**: Transparent, auditable code
 
-## 🚀 Demo
-
-**Live Demo**: [https://faisalarafeh.github.io/password-intelligence](https://faisalarafeh.github.io/password-intelligence)
-
-Or simply open `index.html` in any modern web browser to use it locally.
-
 ## 📖 Usage
 
 ### Basic Usage
