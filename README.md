@@ -186,7 +186,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 **Faisal Arafah**
 - GitHub: [@faisalarafeh](https://github.com/faisalarafeh)
-
+- Website: https://password-intelligence-website.vercel.app/
 ---
 
 <p align="center">Made with ❤️ by Faisal Arafah</p>
